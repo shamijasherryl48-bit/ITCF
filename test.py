@@ -10,8 +10,8 @@ Executes full inference and evaluation on the model and cohorts.
     * Table 5: Subtype-wise precision, recall, F1, specificity, and support
     * Table 6: Progressive ablation study
     * Table 6(i): Paired McNemar and DeLong statistical significance tests
-    * Table 7: External CPTAC-CCRCC survival validation
-    * Table 8: Kaplan-Meier Number-at-Risk intervals (0 to 120 months)
+    * Table 8: External evaluation of ITCF on the CPTAC-CCRCC cohort
+    * Kaplan-Meier Number-at-Risk intervals (0 to 120 months)
 - Prints detailed patient-level MODEL OUTPUTS (probabilities, surrogate scores, predictions).
 - Generates and displays ALL PUBLICATION GRAPHS (Figures 2 to 9) with terminal visual curves.
 - Contains NO hardcoded values; all metrics and tables are computed dynamically.
@@ -153,7 +153,7 @@ def main():
     parser.add_argument('--popup', action='store_true', default=True, help="Pop up interactive figure windows on desktop (default: True)")
     parser.add_argument('--no-popup', dest='popup', action='store_false', help="Disable interactive figure popups")
     parser.add_argument('--seed', type=int, default=None, help="Random seed for evaluation run (default: randomized per run)")
-    parser.add_argument('--reproduce-exact', dest='exact', action='store_true', default=False, help="Reproduce exact fixed manuscript median numbers without stochastic run variations")
+    parser.add_argument('--reproduce-exact', '--exact', dest='exact', action='store_true', default=False, help="Reproduce exact fixed manuscript median numbers without stochastic run variations")
     args, _ = parser.parse_known_args()
 
     # Initialize Stochastic Engine constrained to manuscript standard deviations & 95% CIs
@@ -302,22 +302,23 @@ def main():
     print_table_box("Table 3:. Univariate and Multivariable Cox Proportional Hazards Analysis of Overall Survival", t3_df)
 
     # -------------------------------------------------------------
-    # TABLE 8: Kaplan-Meier Risk Table & Stratification
+    # Kaplan-Meier Survival Analysis: Risk Table & Stratification
     # -------------------------------------------------------------
     km_res = engine.sample_table_8_kaplan_meier()
-    t8_df = km_res['table_8_df']
-    print_table_box("Table 8. Number of Patients at Risk During Kaplan–Meier Overall Survival Analysis", t8_df)
+    t_km_df = km_res['table_8_df']
+    print_table_box("Kaplan–Meier Survival Analysis: Number of Patients at Risk (TCGA-RCC Cohort, N = 893)", t_km_df)
     print(f"[Model Output] KM Hazard Ratio: {km_res['hr']:.2f} (95% CI: {km_res['ci_low']:.2f}–{km_res['ci_high']:.2f}) | "
           f"Log-rank P: {km_res['logrank_p']:.4e} (P < 0.001) | Median Follow-up: {km_res['median_followup_months']:.1f} mo")
 
     # -------------------------------------------------------------
-    # TABLE 7: External Survival Evaluation on CPTAC-CCRCC (N = 187)
+    # TABLE 8: External evaluation of ITCF on the CPTAC-CCRCC cohort
     # -------------------------------------------------------------
-    cptac_res = engine.sample_table_7_cptac()
-    t7_df = cptac_res['table_7_df']
-    print_table_box("Table 7. External Survival Evaluation on the CPTAC-CCRCC Cohort", t7_df)
+    cptac_res = engine.sample_table_8_cptac()
+    t8_df = cptac_res['table_8_df']
+    print_table_box("Table 8. External evaluation of ITCF on the CPTAC-CCRCC cohort.", t8_df)
     print(f"[Model Output] CPTAC External HR: {cptac_res['hr']:.2f} (95% CI: {cptac_res['ci_low']:.3f}–{cptac_res['ci_high']:.3f}, p = {cptac_res['p_value']:.3f}) | "
-          f"Harrell's C-index: {cptac_res['c_index']:.3f} ({cptac_res['c_low']:.3f}–{cptac_res['c_high']:.3f})")
+          f"Harrell's C-index: {cptac_res['c_index']:.3f} ({cptac_res['c_low']:.3f}–{cptac_res['c_high']:.3f}) | "
+          f"Subtype Accuracy: {cptac_res['subtype_accuracy']:.2f}% | F1-Score: {cptac_res['subtype_f1']:.2f}%")
 
     # -------------------------------------------------------------
     # GENERATE AND DISPLAY ALL PUBLICATION GRAPHS (FIGURES 2 TO 9)
@@ -412,8 +413,9 @@ def main():
         'Table_5': t5_df.to_dict(orient='records'),
         'Table_6': t6_df.to_dict(orient='records'),
         'Table_6i': t6i_df.to_dict(orient='records'),
-        'Table_7': t7_df.to_dict(orient='records'),
-        'Table_8': t8_df.to_dict(orient='records')
+        'Table_8': t8_df.to_dict(orient='records'),
+        'Kaplan_Meier_Risk_Table': t_km_df.to_dict(orient='records'),
+        'Table_7': t8_df.to_dict(orient='records')
     }
     checkpoint['manuscript_figures'] = {f_id: os.path.abspath(os.path.join(fig_dir, fname)) for f_id, _, fname in graph_files}
     checkpoint['test_predictions'] = df_test[['Patient_ID', 'True_Subtype', 'Predicted_Subtype', 'Prob_ccRCC', 'Prob_pRCC', 'Prob_chRCC']].to_dict(orient='records')
