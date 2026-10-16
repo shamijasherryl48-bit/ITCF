@@ -12,53 +12,6 @@ Official source code, pre-trained model weights, dynamic verification pipelines,
 
 ---
 
-## 📌 Responses to Peer-Reviewer Inquiries
-
-### Response to Reviewer Comment 3: Inconsistency Resolution & Verification Pipeline
-> **Reviewer Comment 3:**  
-> *"Severe inconsistency between tabulated results and main‑text descriptions. In Table 2, the proposed ITCF yields an AUC of 91.42%, whereas the GCN comparator reports an AUC of 99.95%. By contrast, the abstract, main body and conclusions repeatedly claim that the proposed method achieves an AUC of 99.95% and outperforms all competing approaches. Such inconsistency fundamentally undermines the credibility of core conclusions. The authors must cross‑check raw experimental outputs, tables, figures and all textual statements. Calculation pipelines for every evaluation metric, confidence intervals and experimental logs/code should be supplied."*
-
-**Author Resolution & Audit:**
-1. **Clarification of Table Numbering & Typographical Transposition:**  
-   In the earlier preliminary draft, a typographical transposition inadvertently swapped row identifiers between the proposed ITCF and published comparator baselines, and conflated Table 2 with Table 4.  
-   - **Table 2** is strictly the **Patient-level Subtype Distribution** across the 80/20 train/test split:
-     - Clear-cell RCC (ccRCC / KIRC): 408 training, 102 held-out test (Total = 511)
-     - Papillary RCC (pRCC / KIRP): 218 training, 55 held-out test (Total = 273)
-     - Chromophobe RCC (chRCC / KICH): 88 training, 22 held-out test (Total = 109)
-     - **Total Cohort**: 714 training (80%), 179 held-out test (20%) (Total = 893 patients)
-   - **Table 4** is the **Multi-Modal Subtype Classification Benchmark Comparison**:
-     - **ITCF (Proposed)**: Accuracy = **99.44%**, Precision = **99.68%**, Recall = **99.39%**, F1-score = **99.53%**, Macro-average AUC = **99.92%** (0.9992, 95% CI: 0.9973–1.0000).
-     - **GCN (Comparator)**: Accuracy = **91.20%**, Precision = **90.80%**, Recall = **91.50%**, F1-score = **91.10%**, AUC = **94.12%**.
-     - **DLF (Comparator)**: Accuracy = **89.50%**, AUC = **92.68%**.
-     - **LAMSVM (Comparator)**: Accuracy = **87.30%**, AUC = **90.89%**.
-     - **TGAN (Comparator)**: Accuracy = **84.50%**, AUC = **88.34%**.
-2. **Cross-Check Across Text and Figures:**  
-   All textual descriptions (Abstract, Section 1, Section 4, Section 5, and Section 6), tables (Table 4, Table 5, Table 6), and figures (Figure 6 confusion matrix, Figure 7 ROC curves, Figure 8 ablation bars) have been thoroughly cross-checked and verified against raw outputs. They are **100% mathematically and empirically consistent**:
-   - Total test patients: $N = 179$
-   - Correctly classified: $178/179$ (102 ccRCC, 54 pRCC, 22 chRCC; 1 pRCC misclassified as ccRCC)
-   - Test accuracy: $178 / 179 = 99.44\%$
-   - One-vs-Rest AUCs (Figure 7): ccRCC = $0.9998$, pRCC = $0.9991$, chRCC = $0.9987$, Macro-Average = $0.9992$ ($99.92\%$).
-3. **Open-Source Pipeline & Log Availability:**  
-   The entire calculation pipeline—including raw model inference, bootstrap 95% confidence intervals, Edwards continuity-corrected McNemar tests, multi-class DeLong tests, and run logs—is publicly provided in this repository.
-
----
-
-### Response to Reviewer Comment 8: Data Availability & Compliance Statements
-> **Reviewer Comment 8:**  
-> *"Inconsistent data‑availability and ethical statements. The study analyses publicly available patient‑derived histopathological, genomic and clinical data, yet declares “Data Availability Statement: Not Applicable” and claims “no studies involving human participants were performed”. The authors are requested to accurately document TCGA access pathways, dataset versions, download dates, availability of processing scripts, ethical waivers or compliance justifications for secondary analyses of public de‑identified databases."*
-
-**Author Resolution & Statements:**
-
-#### Data Availability Statement
-> The multi-modal data used in this study were obtained from publicly available repositories. TCGA-RCC data (TCGA-KIRC, TCGA-KIRP and TCGA-KICH) were downloaded from the Genomic Data Commons (GDC) Data Portal ([https://portal.gdc.cancer.gov/](https://portal.gdc.cancer.gov/)) in October 2025. The CPTAC-CCRCC cohort was obtained from the Clinical Proteomic Tumor Analysis Consortium (CPTAC) / Proteomic Data Commons in October 2025. This study is a secondary analysis of de-identified public data; no new patient data were generated. The source code, patient-level train/test split indices, and evaluation scripts are publicly available at: **[https://github.com/shamijasherryl48-bit/ITCF.git](https://github.com/shamijasherryl48-bit/ITCF.git)**.
-
-#### Ethical Compliance & Approval Statement
-> **Ethical Approval:** This investigation is based exclusively on secondary analysis of publicly available, de-identified patient data obtained from The Cancer Genome Atlas (TCGA) and the Clinical Proteomic Tumor Analysis Consortium (CPTAC). Because the data are fully de-identified and publicly accessible in open research repositories, separate institutional review board (IRB) approval and informed consent were not required, in strict accordance with the TCGA and CPTAC open data-use policies.  
-> **Informed Consent:** Not applicable; no individual patient interactions or prospective human participant recruitment were conducted. De-identified secondary data were accessed in compliance with international ethical guidelines for retrospective database studies.  
-> **Conflict of Interest:** The authors declare that they have no competing financial or non-financial interests.
-
----
-
 ## 🔬 Framework Architecture Overview
 
 The ITCF framework combines genomic alterations, biological pathway priors, clinical variables, tumor mutational burden (TMB), and histopathological whole-slide tissue images (WSIs) into a unified multi-modal representation.
@@ -268,6 +221,16 @@ python -m unittest discover tests
 6. **Figure 7**: One-vs-Rest ROC Curves with Bootstrap 95% CIs.
 7. **Figure 8**: Ablation Study Progressive AUC Improvements.
 8. **Figure 9**: Kaplan-Meier Overall Survival Curves with Table 8 Risk Table.
+
+---
+
+## 📄 Data Availability & Ethical Compliance
+
+### Data Availability Statement
+The multi-modal data used in this study were obtained from publicly available repositories. TCGA-RCC data (TCGA-KIRC, TCGA-KIRP and TCGA-KICH) were downloaded from the Genomic Data Commons (GDC) Data Portal (https://portal.gdc.cancer.gov/) in October 2025. The CPTAC-CCRCC cohort was obtained from the Clinical Proteomic Tumor Analysis Consortium (CPTAC) / Proteomic Data Commons in October 2025. This study is a secondary analysis of de-identified public data; no new patient data were generated. The source code, patient-level train/test split indices, and evaluation scripts are publicly available at: **https://github.com/shamijasherryl48-bit/ITCF.git**.
+
+### Ethical Compliance
+This work is based on secondary analysis of publicly available, de-identified data from The Cancer Genome Atlas (TCGA) and the Clinical Proteomic Tumor Analysis Consortium (CPTAC). As the data are publicly available, fully de-identified, and accessed in accordance with TCGA and CPTAC open data-use policies, institutional ethical approval and informed consent were not required. New informed consent was not required because this is a secondary analysis of de-identified public data. The authors declare that they have no conflict of interest.
 
 ---
 
