@@ -1,0 +1,509 @@
+============================== Table 1 (Page 15) ==============================
+15 
+ 
+was used to reduce the learning rate to \(1 \times 10^{-6}\). The batch size was chosen as 16. Both the Molecular 
+Landscape-Aware Transformer (MLAT) and the Cellular Characteristics-Aware Swin Transformer (CCST) used 
+eight attention heads and 12 transformer layers. The feature embeddings were dropped with a rate of 0.2 and 
+momentum parameter value of 0.9. For the contrastive loss, the temperature parameter \(\tau\) was configured to 
+0.07 to ensure that the similarity distribution is controlled during the process of multimodal feature alignment. 
+4.1 Dataset Description 
+We obtained the TCGA cohort of renal cell cancer (KIRC, KIRP and KICH) from the Genomic Data Commons 
+(GDC) Data Portal [23] that is publicly available. 
+Following quality control and multi modal data availability filtering, the final cohort consisted of: 
+• 
+Clear-cell RCC (KIRC): 511 patients / 512 WSIs 
+• 
+Papillary RCC (KIRP): 273 patients / 297 WSIs 
+• 
+Chromophobe RCC (KICH): 109 patients / 121 WSIs 
+• 
+Total No. of patients: 893 , (930 whole-slide images). 
+Inclusion criteria: 
+Diagnostic FFPE H&E whole-slide image, somatic mutation data for reliable TMB calculation, and basic clinical 
+variables (age, sex and tumour stage). 
+Exclusion criteria: 
+Failure to obtain the diagnostic slide, artefacts on the slide, quality of the slides (insufficient tumour material), 
+samples without mutation calling data or lack of survival data (when required for Cox regression analysis). 
+Immunotherapy-response labels: 
+TCGA-RCC does not systematically collect patient-level data on immune-checkpoint inhibitor exposure, 
+treatment regimen, RECIST response or duration of response. Hence, the clinical immunotherapy response is not 
+directly used as a supervised learning target in the present work. TMB is rather considered as a continuous 
+molecular feature and the resulting score is merely provided as a research informative feature based on TMB and 
+not as a validated clinical prediction of response. Table 1 shows the distribution of TMB in TCGA-RCC subtypes. 
+Table 1. Distribution of tumour mutational burden (TMB) across TCGA-RCC subtypes 
+RCC subtype 
+Patients (n) 
+TMB median (mut/Mb) 
+IQR (mut/Mb) 
+TMB ≥10 mut/Mb, n (%) 
+KIRC 
+511 
+1.63 
+1.21–2.13 
+5 (1.0%) 
+KIRP 
+273 
+2.13 
+1.34–2.89 
+4 (1.5%) 
+KICH 
+109 
+1.20 
+0.80–1.70 
+1 (0.9%) 
+Total 
+893 
+1.72 
+1.20–2.40 
+10 (1.1%) 
+ 
+TMB distribution across RCC subtypes: KIRP had the highest median TMB (2.13 mut/Mb), KIRC had the next 
+(1.63 mut/Mb), and KICH had the lowest (1.20 mut/Mb). Only 10 of 893 patients (1.1%) had TMB values ≥10 
+mut/Mb. Hence, the 10 mut/Mb criterion was not used to classify a positive class of response to immunotherapy, 
+
+
+============================== Table 2 (Page 16) ==============================
+16 
+ 
+and it is only provided as a descriptive reference. All missing genomic values were filled using k-nearest neighbour 
+imputation (kNNI). Complete case analysis was used for any clinical variables with missing cases. 
+Tumour Mutational Burden (TMB) was measured as the number of non-synonymous somatic mutations per 
+megabase of the coding region, using the TCGA Multi-Center Mutation Calling in Multiple Cancers (MC3) public 
+MAF files (whole-exome sequencing). The approximation of the denominator of the capture size was around 38 
+Mb. However, the unit is mutations per megabase (mut/Mb). A threshold of TMB ≥ 10 mut/Mb was only used in 
+binary visualisation (Figure 4) and was not used to define a clinical response class for immunotherapy. 
+Additionally, mutations that were commonly found in RCC were included as key driver mutations. VHL is a 
+tumour-suppressor gene that is mutated in most clear-cell RCCs, and it plays a role in the hypoxia pathway. 
+PBRM1 codes for a subunit of the SWI/SNF chromatin-remodelling complex and is the second gene most 
+frequently mutated in clear-cell RCC. MET is a proto-oncogene that is often amplified and mutated in papillary 
+RCC. 
+The following was used as a continuous genomic feature for TMB: 
+(1) RCC subtype classification, and 
+(2) development of a continuous research surrogate score based on TMB. 
+Missing genomic values were handled using k-nearest neighbour imputation (kNNI). Clinical variables with 
+missing values were handled by complete-case analysis. 
+4.1.1 Experimental Setup and Data Partitioning 
+All data partitioning was done at the patient level only to avoid data leakage. All whole slide images or patches 
+from the same patient were always mapped to the same partition. The whole TCGA-RCC cohort (893 patients) 
+was split randomly into a training group of 714 patients (80%) and an independent held-out test group of 179 
+patients (20%) at the patient level. Hyperparameter tuning and model selection were conducted using only the 
+714-patient training set via 5-fold cross validation. The held-out test set was not used in training, hyperparameter 
+optimization or model selection and was only evaluated once at the end after the final model was chosen. The 
+distribution of the Patient-level subtypes is illustrated in Table 2 for the training and held-out test sets. 
+Table 2: Patient-level subtype distribution in the training and held-out test sets 
+Subtype 
+Training Set (n = 714) 
+Held-out Test Set (n = 179) 
+ccRCC 
+408 
+102 
+pRCC 
+218 
+55 
+chRCC 
+88 
+22 
+Total 
+714 
+179 
+ 
+The 714-patient training set was then split into five folds with similar sizes of patients (Fold 1–4: 143 patients, 
+Fold 5: 142 patients). Each pre-processing transformation (e.g., normalization, missing value imputation) was 
+learned from the training data only, and then applied to the validation folds and independent held-out test set. 
+External evaluation was performed on the cohort of 187 patients (CPTAC-CCRCC cohort) as described in Section 
+4.6. 
+
+
+============================== Table 3 (Page 19) ==============================
+19 
+ 
+ 
+ 
+ 
+ 
+Papillary RCC
+ 
+Papillary RCC 
+Figure 2: Proposed ITCF framework - visualization results. The figure displays the representative whole slide 
+images, magnified region, Grad-CAM attention heatmap produced by the model, and the outcome of the RCC 
+subtype prediction for each representative case. The interpretability of the ITCF model in clear-cell RCC, papillary 
+RCC, and chromophobe RCC is illustrated by the heatmaps which highlight the histopathologic regions most 
+important to the classification decision. 
+4.4 Quantitative analysis 
+Table 3 shows the univariate and multivariable Cox proportional hazard analyses for overall survival (OS). In the 
+univariate analysis, age (HR = 1.019, 95% CI: 1.012–1.026; P < 0.001), advanced tumour stage (HR = 1.878, 95% 
+CI: 1.619–2.180; P < 0.001), tumour mutational burden (TMB; HR = 1.766, 95% CI: 1.662–1.878; P < 0.001), 
+SETD2 mutation (HR = 1.243, 95% CI: 1.014–1.524; P = 0.036), MET mutation (HR = 1.457, 95% CI: 1.084–
+1.959; P = 0.013), and the ITCF Surrogate Score (HR = 4.361, 95% CI: 3.696–5.144; P < 0.001) were significantly 
+associated with OS. Univariate analysis showed that sex, VHL mutation, PBRM1 mutation or BAP1 mutation 
+were not statistically significant. In the multivariable analysis, age (HR = 1.026, 95% CI: 1.019–1.033; P < 0.001), 
+advanced tumour stage (HR = 1.504, 95% CI: 1.289–1.754; P < 0.001), SETD2 mutation (HR = 1.328, 95% CI: 
+1.080–1.634; P = 0.007), and the ITCF Surrogate Score (HR = 4.383, 95% CI: 3.679–5.222; P < 0.001) remained 
+statistically significant. After adjustment for the other covariates in the model, sex, VHL mutation, PBRM1 
+mutation, BAP1 mutation and MET mutation were not statistically significant. As the ITCF Surrogate Score 
+already includes information related to TMB, the multivariable model did not include information on TMB as an 
+additional covariate to avoid potential multicollinearity between the variables. To assess the individual association 
+with OS, TMB was kept in the univariate analysis. The results showed that the ITCF Surrogate Score was related 
+to OS, after controlling for the covariates included. It is clarifying that this association is a survival association 
+and cannot be considered as a clinical utility or predict the treatment response. 
+Table 3:. Univariate and Multivariable Cox Proportional Hazards Analysis of Overall Survival 
+Variable 
+Univariate HR (95% 
+CI) 
+P-
+value 
+Multivariable HR (95% 
+CI) 
+P-
+value 
+Age (continuous) 
+1.019 (1.012–1.026) 
+<0.001 
+1.026 (1.019–1.033) 
+<0.001 
+Sex (Male vs Female) 
+1.107 (0.951–1.289) 
+0.190 
+1.081 (0.927–1.259) 
+0.320 
+Tumour Stage (III/IV vs 
+I/II) 
+1.878 (1.619–2.180) 
+<0.001 
+1.504 (1.289–1.754) 
+<0.001 
+TMB (continuous) 
+1.766 (1.662–1.878) 
+<0.001 
+Excluded 
+— 
+VHL mutation 
+0.996 (0.850–1.166) 
+0.956 
+1.090 (0.922–1.288) 
+0.312 
+PBRM1 mutation 
+0.987 (0.826–1.179) 
+0.882 
+1.070 (0.889–1.288) 
+0.475 
+
+
+============================== Table 3 (cont) (Page 20) ==============================
+20 
+ 
+BAP1 mutation 
+1.221 (0.985–1.514) 
+0.069 
+1.045 (0.841–1.299) 
+0.691 
+SETD2 mutation 
+1.243 (1.014–1.524) 
+0.036 
+1.328 (1.080–1.634) 
+0.007 
+MET mutation 
+1.457 (1.084–1.959) 
+0.013 
+1.116 (0.822–1.516) 
+0.482 
+ITCF Surrogate Score 
+4.361 (3.696–5.144) 
+<0.001 
+4.383 (3.679–5.222) 
+<0.001 
+Abbreviations: HR, hazard ratio; CI, confidence interval; OS, overall survival; TMB, tumour mutational burden. 
+TMB was excluded from the multivariable model because the ITCF Surrogate Score incorporates TMB-related 
+information. 
+Figure 3 shows the performance of the proposed model for 100 epochs on the training and test sets (in terms of 
+accuracy and loss). Looking at the upper chart of Fig.4, the accuracy of the proposed model is shown to be 
+gradually increasing towards the near perfect mark in the 100th epoch for the training data. Also, as shown in the 
+test data, there is a rise in the value of the accuracy of the model; however, the values of the model are always 
+below the values of the training data, which shows the way of how the proposed model is performing in the test 
+phase but in the training phase it can be facing an overfitting problem. Moreover, the training and testing losses 
+of the proposed model has decreased as shown in the lower chart of Fig.4. This is seen to have decreased to almost 
+zero for the training loss values while the training loss values are still greater than the testing loss values but are 
+decreasing.  
+ 
+ 
+
+
+============================== Table 4 (Page 21) ==============================
+21 
+ 
+Figure 3: Training and validation performance of the proposed ITCF framework over 100 epochs. The top panel 
+shows the accuracy curves and the bottom panel shows the loss curves for both the training set (green) and the 
+test set (red). The model demonstrates stable convergence with steadily increasing accuracy and decreasing loss, 
+indicating effective learning without significant overfitting. 
+Published results are available for GCN,DLF, LAMSVM, and TGAN. They were not re-estimated on this present 
+714/179 split. No claims of superiority are made. 
+Table 4:. ITCF result on the present split, with published values for GCN, DLF, LAMSVM, and TGAN(not re-
+estimated on this split) 
+Method 
+Accuracy (%) 
+Precision (%) 
+Recall (%) 
+F1-score (%) 
+AUC (%) 
+GCN 
+91.20 
+90.80 
+91.50 
+91.10 
+94.12 
+DLF 
+89.50 
+88.60 
+89.70 
+89.10 
+92.68 
+LAMSVM 
+87.30 
+86.80 
+87.50 
+87.10 
+90.89 
+TGAN 
+84.50 
+83.90 
+85.10 
+84.50 
+88.34 
+ITCF (proposed) 
+99.44 
+99.68 
+99.39 
+99.53 
+99.92 
+ 
+We show the distribution of tumour mutational burden (TMB) by the three TCGA-RCC subtypes in figure 4. The 
+highest median TMB was obtained by KIRP (2.13 mut/Mb), followed by KIRC (1.63 mut/Mb) and KICH (1.20 
+mut/Mb). Only 10 of 893 patients (1.1%) had TMB at or above 10 mut/Mb, a value chosen as a descriptive 
+threshold and used by our institution.The majority of patients (893/893; 99.9%) had TMB values < 10 mut/Mb, 
+which was selected as a descriptive threshold and applied in our institution. For this reason, TMB was not 
+considered as an immunotherapy-response classification, but rather treated as a continuous molecular 
+characteristic.
+Figure 4: Distribution of Tumour Mutational Burden Across TCGA-RCC Subtypes. Violin and box plots show 
+
+
+============================== Table 5 (Page 23) ==============================
+23 
+ 
+ 
+Figure 6. Confusion matrix of the proposed ITCF framework on the patient-level held-out test set (n = 179, 
+independent patient-level held-out test set). 
+The performance of ITCF over the held out test set is detailed in Table 5 for each subtype. The 100% recall for 
+ccRCC and chRCC was due to the fact that there were no misclassifications in these two categories. The 98.18% 
+recall for pRCC was due to the fact that a single case of "pRCC" was misclassified as "ccRCC". The average 
+precision, average recall and average F1-score were 99.68%, 99.39% and 99.53% respectively. The overall 
+accuracy was 99.44% (178/179). Macro averages give equal weights to each subtype, while weighted averages 
+take into account number of patients in each subtype. 
+Table 5: Subtype-wise Performance of the Proposed ITCF Framework (Patient-level Held-out Test Set) 
+Class 
+Precision (%) 
+Recall (%) 
+F1-score (%) 
+Support 
+ccRCC 
+99.03 
+100.00 
+99.51 
+102 
+pRCC 
+100.00 
+98.18 
+99.08 
+55 
+chRCC 
+100.00 
+100.00 
+100.00 
+22 
+Macro average 
+99.68 
+99.39 
+99.53 
+179 
+Weighted average 
+99.45 
+99.44 
+99.44 
+179 
+ 
+The one-vs-rest receiver operating characteristic (ROC) curves of the developed ITCF framework on the 
+independent, patient-level held-out test set (n = 179) is shown in Figure 7. The model achieved excellent 
+discriminative performance across all three RCC subtypes, with AUC values of 0.9998 for ccRCC (95% CI: 
+0.9989–1.0000), 0.9991 for pRCC (95% CI: 0.9972–1.0000), and 0.9987 for chRCC (95% CI: 0.9954–1.0000). 
+The overall discrimination of the three subtypes was very good, with a macro-average AUC of 0.9992. The results 
+are similar to the classification metrics from Table 5 and overall model comparison results of Table 4. 
+
+
+============================== Table 6 & 6(i) (Page 24) ==============================
+24 
+ 
+ 
+Figure 7: One-vs-Rest ROC curves of the proposed ITCF framework on the patient-level held-out test set (n = 
+179).  
+4.5 Ablation Studies 
+The contribution of the individual components of ITCF is assessed in Table 6. This is the same test set of 179 
+patients that is used for all ablation rows. The full ITCF model achieved an accuracy of 99.44%, macro precision 
+of 99.68%, macro recall of 99.39%, macro F1-score of 99.53%, and macro-AUC of 99.92%.   
+Table 6: Ablation Study of the ITCF Framework (Patient-level Held-out Test Set) 
+Model Variant 
+Accuracy 
+(%) 
+Macro 
+Precision (%) 
+Macro 
+Recall (%) 
+Macro F1-
+Score (%) 
+Macro 
+AUC (%) 
+Genomics only (MLAT) 
+91.24  
+90.87  
+91.05  
+90.96  
+93.67  
+Histopathology only (CCST) 
+93.58  
+93.21  
+93.42  
+93.31  
+95.12  
+Basic Transformer 
+88.76  
+88.12  
+88.45  
+88.28  
+90.45  
+MLAT + CCST (w/o 
+contrastive learning) 
+96.09 
+96.54  
+96.71  
+96.62  
+97.91  
+Full ITCF(with contrastive 
+learning) (Proposed) 
+99.44  
+99.68  
+99.39  
+99.53 
+99.92  
+A paired statistical comparison was performed on the same 179-patient held-out test set. The 2 × 2 contingency 
+of correctness was a = 172 (both correct), b = 0 (A correct, B wrong), c = 6 (A wrong, B correct), and d = 1 (both 
+wrong), where A denotes MLAT + CCST without contrastive learning and B denotes the full ITCF. McNemar’s 
+continuity-corrected test on the discordant pairs yielded χ² = 4.17 (df = 1), p = 0.041. The multi-class DeLong test 
+(Stouffer combination) gave Z = 2.68, p = 0.007. Both tests indicate that the performance gain attributable to 
+contrastive learning is statistically significant (Table 6(i)). 
+Table 6(i). Paired statistical comparison of ITCF with and without contrastive learning (n = 179) 
+Metric 
+Without contrastive 
+learning 
+Full 
+ITCF 
+Improvement 
+Test 
+Statistic 
+p-
+value 
+
+
+============================== Table 7 (Page 25) ==============================
+25 
+ 
+Accuracy 
+96.09% 
+99.44% 
++3.35 percentage 
+points 
+McNemar 
+(cont.) 
+χ² = 
+4.17 
+0.041 
+Macro-
+AUC 
+97.91% 
+99.92% 
++2.01 percentage 
+points 
+DeLong 
+(Stouffer) 
+Z = 2.68 
+0.007 
+ 
+The single-modal baselines obtained AUC of 93.67% and 95.12% respectively for the genomics-only MLAT 
+model and the histopathology-only CCST model respectively. No contrastive learning of combining MLAT and 
+CCST increased the AUC to 97.91%. The complete ITCF framework achieved a macro-AUC of 99.92%, an 
+accuracy of 99.44%, a macro precision of 99.68%, a macro recall of 99.39% and a macro F1-score of 99.53%. 
+This finding indicates that multimodal integration and contrastive learning could help to enhance the classification 
+of RCC subtypes. The improvements reported should be taken with the caveat that they were obtained using the 
+same test set of patients, at the patient level, and that the same evaluation procedures were used for all variants. 
+ 
+Figure 8. Ablation study showing the progressive improvement in AUC with the sequential addition of each 
+component of the ITCF framework (n = 179, independent patient-level held-out test set). 
+4.6 External Validation 
+The CPTAC-CCRCC cohort was then used as an external cohort to assess the generalizability of the proposed 
+Integrated Transformer–Contrastive Framework (ITCF) for survival assessment [24]. No retraining or fine-tuning 
+was done on the external data and external evaluation was done. To evaluate the generalizability of the survival-
+prediction part of ITCF to the TCGA-RCC development cohort, external prognostic evaluation was carried out 
+on the CPTAC-CCRCC cohort. The patients who were eligible were those for whom input models were available 
+and where annotations of overall survival (survival time, and vital status) were available. Trained model was not 
+retrained or finetuned. The Kaplan–Meier survival analysis, log rank test, and Cox proportional-hazards regression 
+were used to evaluate the prognostic performance. Patients were divided into high-risk and low-risk groups based 
+on their risk prediction scores. Time-dependent AUCs and Harrell's concordance index were also performed. 
+Table 7. External Survival Evaluation on the CPTAC-CCRCC Cohort 
+
+
+============================== Table 8 (Page 26) ==============================
+26 
+ 
+Measure 
+Result 
+Eligible patients (n) 
+187 
+Overall-survival events (deaths, n) 
+72 (38.5%) 
+Censored patients (n) 
+115 (61.5%) 
+Median follow-up (months) 
+52.0 
+High-risk group (patients / deaths) 
+94 / 46 
+Low-risk group (patients / deaths) 
+93 / 26 
+Hazard ratio (high vs. low risk) 
+1.63 
+95% confidence interval for HR 
+1.003–2.634 
+Log-rank P-value 
+0.046 
+Harrell's C-index (95% CI) 
+0.614 (0.536–0.690) 
+Time-dependent AUC at 12 months 
+0.694 
+Time-dependent AUC at 24 months 
+0.633 
+Time-dependent AUC at 36 months 
+0.675 
+Time-dependent AUC at 60 months 
+0.584 
+4.7 Survival Analysis 
+Survival was analyzed using a standard Cox model and a Kaplan–Meier analysis. There was no covariate that did 
+not meet the proportional hazards assumption, so the model was not time-dependent. Patients were divided into 
+two groups: high-risk and low-risk groups based on the median of the surrogate score. 
+When examining the entire TCGA-RCC cohort, the high-risk group had significantly poorer overall survival than 
+the low-risk group (log-rank P < 0.001). This unadjusted comparison is a hazard ratio of 2.47 (1.89 - 3.23). It is 
+NOT the multivariate answer. The median follow-up period was 48.6 months. The risk table is based on 450 and 
+443 patients, adding up to the total population of 893. 
+ 
+Figure 9: Kaplan–Meier overall survival curves for the entire TCGA-RCC cohort (n = 893). The patients were 
+divided into low-risk (n = 450) and high-risk (n = 443) groups based on the median ITCF surrogate score. The 
+value of the hazard ratio (HR) with 95% confidence interval (CI) and log rank P-value are shown. This is a full-
+cohort analysis and not the independent test set of 179 patients. 
+Table 8. Number of Patients at Risk During Kaplan–Meier Overall Survival Analysis 
+
+

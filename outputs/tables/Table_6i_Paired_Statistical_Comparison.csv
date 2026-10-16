@@ -1,0 +1,3 @@
+Metric,Without contrastive learning,Full ITCF,Improvement,Test,Statistic,p-value
+Accuracy,96.10%,99.44%,+3.34 percentage points,McNemar (cont.),χ² = 4.18,0.041
+Macro-AUC,97.80%,99.92%,+2.12 percentage points,DeLong (Stouffer),Z = 2.60,0.009

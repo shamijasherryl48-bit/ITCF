@@ -1,0 +1,15 @@
+Measure,Result
+Eligible patients (n),187
+"Overall-survival events (deaths, n)",72 (38.5%)
+Censored patients (n),115 (61.5%)
+Median follow-up (months),51.7
+High-risk group (patients / deaths),94 / 46
+Low-risk group (patients / deaths),93 / 26
+Hazard ratio (high vs. low risk),1.78
+95% confidence interval for HR,1.099–2.886
+Log-rank P-value,0.045
+Harrell's C-index (95% CI),0.626 (0.549–0.690)
+Time-dependent AUC at 12 months,0.706
+Time-dependent AUC at 24 months,0.623
+Time-dependent AUC at 36 months,0.687
+Time-dependent AUC at 60 months,0.596

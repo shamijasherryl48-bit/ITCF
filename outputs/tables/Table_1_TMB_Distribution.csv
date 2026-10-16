@@ -1,0 +1,5 @@
+RCC subtype,Patients (n),TMB median (mut/Mb),IQR (mut/Mb),"TMB ≥10 mut/Mb, n (%)"
+KIRC,511,1.65,1.22–2.10,5 (1.0%)
+KIRP,273,2.12,1.38–2.87,4 (1.5%)
+KICH,109,1.19,0.80–1.69,1 (0.9%)
+Total,893,1.70,1.22–2.37,10 (1.1%)

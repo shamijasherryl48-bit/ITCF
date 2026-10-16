@@ -1,0 +1,5 @@
+Subtype,Training Set (n = 714),Held-out Test Set (n = 179)
+ccRCC,408,102
+pRCC,218,55
+chRCC,88,22
+Total,714,179

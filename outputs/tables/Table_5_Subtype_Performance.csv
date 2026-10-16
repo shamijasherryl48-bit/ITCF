@@ -1,0 +1,6 @@
+Class,Precision (%),Recall (%),F1-score (%),Support
+ccRCC,99.03,100.00,99.51,102
+pRCC,100.00,98.18,99.08,55
+chRCC,100.00,100.00,100.00,22
+Macro average,99.68,99.39,99.53,179
+Weighted average,99.45,99.44,99.44,179

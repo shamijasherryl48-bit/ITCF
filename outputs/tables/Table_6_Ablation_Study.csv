@@ -1,0 +1,6 @@
+Model Variant,Accuracy (%),Macro Precision (%),Macro Recall (%),Macro F1-Score (%),Macro AUC (%)
+Genomics only (MLAT),91.24,91.04,91.15,90.77,94.06
+Histopathology only (CCST),93.48,93.34,93.55,93.45,95.20
+Basic Transformer,88.50,88.33,88.50,88.26,90.25
+MLAT + CCST (w/o contrastive learning),96.10,96.34,96.74,96.69,97.80
+Full ITCF(with contrastive learning) (Proposed),99.44,99.68,99.39,99.53,99.92
