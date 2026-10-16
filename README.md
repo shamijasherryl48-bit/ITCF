@@ -105,8 +105,8 @@ ITCF/
 │   │   └── losses.py                    # Multi-task objective: CE + InfoNCE + Contrastive
 │   ├── survival/                        # Prognostic Survival Analysis (Sections 3.4.1 & 4.4)
 │   │   ├── cox_model.py                 # Univariate & Multivariable Cox regression (Table 3)
-│   │   ├── kaplan_meier.py              # Kaplan-Meier, Log-rank test, Risk Table (TCGA-RCC)
-│   │   └── time_dependent.py            # External CPTAC validation (Table 8)
+│   │   ├── kaplan_meier.py              # Kaplan-Meier, Log-rank test, Risk Table (Table 8)
+│   │   └── time_dependent.py            # Harrell's C-index, Time-dependent AUC (Table 7)
 │   ├── evaluation/                      # Metrics and statistical significance testing
 │   │   ├── metrics.py                   # Equations 22-25, Table 4, Table 5, bootstrap CIs
 │   │   ├── statistical_tests.py         # McNemar (cont.), Paired DeLong test (Table 6, 6(i))
@@ -205,36 +205,10 @@ python -m unittest discover tests
 - **Tumour Stage III/IV (Multivariable)**: $\text{HR} = 1.504$ ($95\% \text{ CI}: 1.289 - 1.754$, $P < 0.001$)
 - **Age (Multivariable)**: $\text{HR} = 1.026$ ($95\% \text{ CI}: 1.019 - 1.033$, $P < 0.001$)
 
-### Table 8: External evaluation of ITCF on the CPTAC-CCRCC cohort
-
-| Evaluation task | Measure | Result |
-|---|---|---|
-| Cohort characteristics | Eligible patients (n) | 187 |
-| Overall survival | Deaths, n (%) | 72 (38.5%) |
-| Overall survival | Censored patients, n (%) | 115 (61.5%) |
-| Overall survival | Median follow-up (months) | 52.0 |
-| Risk stratification | High-risk group (patients / deaths) | 94 / 46 |
-| Risk stratification | Low-risk group (patients / deaths) | 93 / 26 |
-| Survival analysis | Hazard ratio (high vs. low risk) | 1.63 |
-| Survival analysis | 95% CI for hazard ratio | 1.003–2.634 |
-| Survival analysis | Log-rank p-value | 0.046 |
-| Survival discrimination | Harrell’s C-index (95% CI) | 0.614 (0.536–0.690) |
-| Survival discrimination | Time-dependent AUC at 12 months | 0.694 |
-| Survival discrimination | Time-dependent AUC at 24 months | 0.633 |
-| Survival discrimination | Time-dependent AUC at 36 months | 0.675 |
-| Survival discrimination | Time-dependent AUC at 60 months | 0.584 |
-| Subtype classification | Accuracy (%) | 99.47 |
-| Subtype classification | Precision (%) | 99.32 |
-| Subtype classification | Recall (%) | 99.58 |
-| Subtype classification | F1-score (%) | 99.45 |
-
-### Kaplan–Meier Analysis: Number of Patients at Risk During Overall Survival Analysis (N = 893)
-| Risk stratification group | 0 mo | 20 mo | 40 mo | 60 mo | 80 mo | 100 mo | 120 mo |
-|---|---|---|---|---|---|---|---|
-| Low-risk (n=450) | 450 | 362 | 274 | 218 | 169 | 112 | 48 |
-| High-risk (n=443) | 443 | 228 | 141 | 98 | 67 | 42 | 16 |
-
-- **Unadjusted Hazard Ratio**: $2.47$ ($95\% \text{ CI}: 1.89 - 3.23$, Log-rank $P < 0.001$, Median Follow-up: $48.6\text{ months}$).
+### Table 7: External Survival Validation on CPTAC-CCRCC (N = 187)
+- **High-Risk vs. Low-Risk Hazard Ratio**: $1.63$ (95% CI: $1.003 - 2.634$, Log-rank $P = 0.046$)
+- **Harrell's C-index**: $0.614$ (95% CI: $0.536 - 0.690$)
+- **Time-Dependent AUCs**: 12 mo: $0.694$ | 24 mo: $0.633$ | 36 mo: $0.675$ | 60 mo: $0.584$
 
 ---
 
@@ -246,7 +220,7 @@ python -m unittest discover tests
 5. **Figure 6**: Test Set Confusion Matrix ($n = 179$).
 6. **Figure 7**: One-vs-Rest ROC Curves with Bootstrap 95% CIs.
 7. **Figure 8**: Ablation Study Progressive AUC Improvements.
-8. **Figure 9**: Kaplan-Meier Overall Survival Curves with Number-at-Risk Table.
+8. **Figure 9**: Kaplan-Meier Overall Survival Curves with Table 8 Risk Table.
 
 ---
 

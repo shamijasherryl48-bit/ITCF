@@ -128,32 +128,44 @@ def evaluate_cptac_cohort(df_cptac: pd.DataFrame) -> Dict:
     # Time dependent AUC
     auc_dict = compute_time_dependent_auc(time, event, risk_scores, [12, 24, 36, 60])
     
-    # Generate Table 8 DataFrame (3-column layout matching manuscript)
-    table_8_rows = [
-        {'Evaluation task': 'Cohort characteristics', 'Measure': 'Eligible patients (n)', 'Result': f"{n_patients}"},
-        {'Evaluation task': 'Overall survival', 'Measure': 'Deaths, n (%)', 'Result': f"{n_events} ({n_events/n_patients*100:.1f}%)"},
-        {'Evaluation task': 'Overall survival', 'Measure': 'Censored patients, n (%)', 'Result': f"{n_censored} ({n_censored/n_patients*100:.1f}%)"},
-        {'Evaluation task': 'Overall survival', 'Measure': 'Median follow-up (months)', 'Result': f"{med_fu:.1f}"},
-        {'Evaluation task': 'Risk stratification', 'Measure': 'High-risk group (patients / deaths)', 'Result': f"{len(high_df)} / {int(np.sum(high_df['OS_Event']))}"},
-        {'Evaluation task': 'Risk stratification', 'Measure': 'Low-risk group (patients / deaths)', 'Result': f"{len(low_df)} / {int(np.sum(low_df['OS_Event']))}"},
-        {'Evaluation task': 'Survival analysis', 'Measure': 'Hazard ratio (high vs. low risk)', 'Result': f"{hr:.2f}"},
-        {'Evaluation task': 'Survival analysis', 'Measure': '95% CI for hazard ratio', 'Result': f"{ci_low:.3f}–{ci_high:.3f}"},
-        {'Evaluation task': 'Survival analysis', 'Measure': 'Log-rank p-value', 'Result': f"{lr_res.p_value:.3f}"},
-        {'Evaluation task': 'Survival discrimination', 'Measure': "Harrell’s C-index (95% CI)", 'Result': f"{c_idx:.3f} ({c_ci_l:.3f}–{c_ci_h:.3f})"},
-        {'Evaluation task': 'Survival discrimination', 'Measure': 'Time-dependent AUC at 12 months', 'Result': f"{auc_dict[12]:.3f}"},
-        {'Evaluation task': 'Survival discrimination', 'Measure': 'Time-dependent AUC at 24 months', 'Result': f"{auc_dict[24]:.3f}"},
-        {'Evaluation task': 'Survival discrimination', 'Measure': 'Time-dependent AUC at 36 months', 'Result': f"{auc_dict[36]:.3f}"},
-        {'Evaluation task': 'Survival discrimination', 'Measure': 'Time-dependent AUC at 60 months', 'Result': f"{auc_dict[60]:.3f}"},
-        {'Evaluation task': 'Subtype classification', 'Measure': 'Accuracy (%)', 'Result': '99.47'},
-        {'Evaluation task': 'Subtype classification', 'Measure': 'Precision (%)', 'Result': '99.32'},
-        {'Evaluation task': 'Subtype classification', 'Measure': 'Recall (%)', 'Result': '99.58'},
-        {'Evaluation task': 'Subtype classification', 'Measure': 'F1-score (%)', 'Result': '99.45'},
-    ]
-    table_8_df = pd.DataFrame(table_8_rows)
+    # Generate Table 7 DataFrame
+    table_7_df = pd.DataFrame({
+        'Measure': [
+            'Eligible patients (n)',
+            'Overall-survival events (deaths, n)',
+            'Censored patients (n)',
+            'Median follow-up (months)',
+            'High-risk group (patients / deaths)',
+            'Low-risk group (patients / deaths)',
+            'Hazard ratio (high vs. low risk)',
+            '95% confidence interval for HR',
+            'Log-rank P-value',
+            "Harrell's C-index (95% CI)",
+            'Time-dependent AUC at 12 months',
+            'Time-dependent AUC at 24 months',
+            'Time-dependent AUC at 36 months',
+            'Time-dependent AUC at 60 months'
+        ],
+        'Result': [
+            f"{n_patients}",
+            f"{n_events} ({n_events/n_patients*100:.1f}%)",
+            f"{n_censored} ({n_censored/n_patients*100:.1f}%)",
+            f"{med_fu:.1f}",
+            f"{len(high_df)} / {int(np.sum(high_df['OS_Event']))}",
+            f"{len(low_df)} / {int(np.sum(low_df['OS_Event']))}",
+            f"{hr:.2f}",
+            f"{ci_low:.3f}–{ci_high:.3f}",
+            f"{lr_res.p_value:.3f}",
+            f"{c_idx:.3f} ({c_ci_l:.3f}–{c_ci_h:.3f})",
+            f"{auc_dict[12]:.3f}",
+            f"{auc_dict[24]:.3f}",
+            f"{auc_dict[36]:.3f}",
+            f"{auc_dict[60]:.3f}"
+        ]
+    })
     
     return {
-        'table_8_df': table_8_df,
-        'table_7_df': table_8_df,
+        'table_7_df': table_7_df,
         'hr': hr,
         'ci': (ci_low, ci_high),
         'p_value': lr_res.p_value,
