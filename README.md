@@ -205,10 +205,33 @@ python -m unittest discover tests
 - **Tumour Stage III/IV (Multivariable)**: $\text{HR} = 1.504$ ($95\% \text{ CI}: 1.289 - 1.754$, $P < 0.001$)
 - **Age (Multivariable)**: $\text{HR} = 1.026$ ($95\% \text{ CI}: 1.019 - 1.033$, $P < 0.001$)
 
-### Table 7: External Survival Validation on CPTAC-CCRCC (N = 187)
-- **High-Risk vs. Low-Risk Hazard Ratio**: $1.63$ (95% CI: $1.003 - 2.634$, Log-rank $P = 0.046$)
-- **Harrell's C-index**: $0.614$ (95% CI: $0.536 - 0.690$)
-- **Time-Dependent AUCs**: 12 mo: $0.694$ | 24 mo: $0.633$ | 36 mo: $0.675$ | 60 mo: $0.584$
+### Table 7 / Table 8: External Survival Evaluation on the CPTAC-CCRCC Cohort (N = 187)
+
+| Measure | Result |
+|---|---|
+| Eligible patients (n) | 187 |
+| Overall-survival events (deaths, n) | 72 (38.5%) |
+| Censored patients (n) | 115 (61.5%) |
+| Median follow-up (months) | 52.0 |
+| High-risk group (patients / deaths) | 94 / 46 |
+| Low-risk group (patients / deaths) | 93 / 26 |
+| Hazard ratio (high vs. low risk) | 1.63 |
+| 95% confidence interval for HR | 1.003–2.634 |
+| Log-rank P-value | 0.046 |
+| Harrell's C-index (95% CI) | 0.614 (0.536–0.690) |
+| Time-dependent AUC at 12 months | 0.694 |
+| Time-dependent AUC at 24 months | 0.633 |
+| Time-dependent AUC at 36 months | 0.675 |
+| Time-dependent AUC at 60 months | 0.584 |
+
+### Table 8: Number of Patients at Risk During Kaplan–Meier Overall Survival Analysis (N = 893)
+
+| Risk stratification group | 0 mo | 20 mo | 40 mo | 60 mo | 80 mo | 100 mo | 120 mo |
+|---|---|---|---|---|---|---|---|
+| **Low-risk (n=450)** | 450 | 362 | 274 | 218 | 169 | 112 | 48 |
+| **High-risk (n=443)** | 443 | 228 | 141 | 98 | 67 | 42 | 16 |
+
+- **Unadjusted Hazard Ratio**: $2.47$ ($95\% \text{ CI}: 1.89 - 3.23$, Log-rank $P < 0.001$, Median Follow-up: $48.6\text{ months}$).
 
 ---
 
